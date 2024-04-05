@@ -14,7 +14,7 @@ const updatePercentage = () => {
   percentage = Math.max(0, Math.min(100, percentage));
 
   progressBar.style.width = percentage + '%';
-  resultDiv.textContent = `Progress: ${percentage.toFixed(2)}%`;
+  resultDiv.textContent = `Progress: ${percentage.toFixed(5)}%`;
 
   setTimeout(updatePercentage, 1000);
 };
