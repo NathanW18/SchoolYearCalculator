@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
   const startDate = new Date('2023-09-05T00:00:00');
-  const endDate = new Date('2024-06-29T00:00:00');
+  const endDate = new Date('2024-06-20T00:00:00');
   const totalTime = endDate - startDate;
 
   const progressBar = document.getElementById('progressFill');
