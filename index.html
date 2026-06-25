@@ -33,19 +33,74 @@
     p {
       margin: 5px 0;
     }
+
+    /* New styles for configuration */
+    .hidden {
+      display: none !important;
+    }
+    
+    .form-group {
+      margin-bottom: 10px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 5px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+
+    button.secondary {
+      background-color: #777;
+      margin-left: 5px;
+    }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="container">
-    <p class="title">School Year Tracker</p>
-    <p>Start Date: September 5, 2023</p>
-    <p>End Date: June 19, 2024</p>
+
+  <div id="tracker-view" class="hidden">
+    <div class="container">
+      <p class="title">School Year Tracker</p>
+      <p>Start Date: <span id="display-start"></span></p>
+      <p>End Date: <span id="display-end"></span></p>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div id="result"></div>
+    <button id="edit-btn" class="secondary">Change Dates</button>
   </div>
-  <div class="progress-bar">
-    <div class="progress-fill" id="progressFill"></div>
+
+  <div id="setup-view" class="hidden">
+    <p class="title">Set School Year Dates</p>
+    <div class="form-group">
+      <label for="start-date-input">Start Date</label>
+      <input type="date" id="start-date-input">
+    </div>
+    <div class="form-group">
+      <label for="end-date-input">End Date</label>
+      <input type="date" id="end-date-input">
+    </div>
+    <button id="save-btn">Save Dates</button>
+    <button id="cancel-btn" class="secondary hidden">Cancel</button>
   </div>
-  <div id="result"></div>
+
   <script src="popup.js"></script>
 </body>
 </html>
