@@ -3,104 +3,227 @@
 <head>
   <title>School Year Tracker</title>
   <style>
-    body {
-      width: 300px;
-      padding: 20px;
+    :root {
+      color-scheme: light;
       font-family: 'Open Sans', sans-serif;
-      background-color: #f8f8f8;
+      background: #eef2f8;
+      color: #111;
+    }
+
+    body {
+      width: 340px;
+      min-height: 420px;
+      padding: 18px;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    .panel {
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 16px 40px rgba(25, 43, 77, 0.12);
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: #555;
+      font-size: 0.9rem;
     }
 
     .progress-bar {
       width: 100%;
-      height: 20px;
-      background-color: #f0f0f0;
-      border-radius: 10px;
+      height: 16px;
+      background-color: #f0f4fb;
+      border-radius: 999px;
       overflow: hidden;
-      margin-bottom: 5px;
+      margin-top: 10px;
     }
 
     .progress-fill {
       height: 100%;
-      background-color: #4caf50;
       width: 0;
+      background: linear-gradient(135deg, #3f8ee3 0%, #44c485 100%);
+      transition: width 0.3s ease;
     }
 
-    .title {
-      font-weight: bold;
-      margin-bottom: 10px;
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
     }
 
-    p {
-      margin: 5px 0;
+    .stat {
+      background: #f6f8ff;
+      padding: 12px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      line-height: 1.4;
     }
 
-    /* New styles for configuration */
+    .stat strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #1f2d4d;
+    }
+
+    .milestone-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 6px;
+    }
+
+    .milestone-list li {
+      font-size: 0.86rem;
+      color: #3d4a6b;
+    }
+
     .hidden {
       display: none !important;
     }
-    
+
     .form-group {
-      margin-bottom: 10px;
+      display: grid;
+      gap: 6px;
     }
 
-    .form-group label {
-      display: block;
-      font-size: 12px;
-      margin-bottom: 2px;
+    label {
+      font-size: 0.85rem;
+      color: #34405c;
     }
 
-    .form-group input {
+    input,
+    select {
       width: 100%;
-      padding: 5px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #d5dae6;
+      background: #fff;
+      font-size: 0.9rem;
+      color: #122238;
       box-sizing: border-box;
     }
 
     button {
-      background-color: #4caf50;
-      color: white;
+      width: 100%;
       border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
       cursor: pointer;
-      margin-top: 5px;
+      color: #fff;
+      background: linear-gradient(135deg, #3f8ee3 0%, #44c485 100%);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 16px rgba(34, 93, 214, 0.14);
     }
 
     button.secondary {
-      background-color: #777;
-      margin-left: 5px;
+      background: #667794;
+      margin-top: 6px;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-
-  <div id="tracker-view" class="hidden">
-    <div class="container">
-      <p class="title">School Year Tracker</p>
-      <p>Start Date: <span id="display-start"></span></p>
-      <p>End Date: <span id="display-end"></span></p>
+  <div id="tracker-view" class="panel hidden">
+    <div>
+      <p class="title" id="term-label">School Year Tracker</p>
+      <p class="subtitle" id="status-label">Live progress for your current academic term</p>
     </div>
-    <div class="progress-bar">
+
+    <div class="progress-bar" aria-label="Progress">
       <div class="progress-fill" id="progressFill"></div>
     </div>
-    <div id="result"></div>
-    <button id="edit-btn" class="secondary">Change Dates</button>
+
+    <div class="stats-grid">
+      <div class="stat">
+        <strong>Start</strong>
+        <span id="display-start"></span>
+      </div>
+      <div class="stat">
+        <strong>End</strong>
+        <span id="display-end"></span>
+      </div>
+      <div class="stat">
+        <strong>Time remaining</strong>
+        <span id="time-remaining"></span>
+      </div>
+      <div class="stat">
+        <strong>Business days left</strong>
+        <span id="business-days-left"></span>
+      </div>
+    </div>
+
+    <div class="stat">
+      <strong>Progress</strong>
+      <span id="result"></span>
+    </div>
+
+    <div>
+      <strong>Milestones</strong>
+      <ul class="milestone-list" id="milestones"></ul>
+    </div>
+
+    <div class="button-row">
+      <button id="edit-btn">Edit</button>
+      <button id="clear-btn" class="secondary">Clear</button>
+    </div>
   </div>
 
-  <div id="setup-view" class="hidden">
-    <p class="title">Set School Year Dates</p>
+  <div id="setup-view" class="panel hidden">
+    <div>
+      <p class="title">Configure School Year</p>
+      <p class="subtitle">Use saved terms or create a custom schedule.</p>
+    </div>
+
+    <div class="form-group">
+      <label for="saved-term-select">Saved term</label>
+      <select id="saved-term-select"></select>
+    </div>
+
+    <div class="form-group">
+      <label for="term-label-input">Term name</label>
+      <input type="text" id="term-label-input" placeholder="Fall 2026, Spring Semester, etc." />
+    </div>
+
     <div class="form-group">
       <label for="start-date-input">Start Date</label>
-      <input type="date" id="start-date-input">
+      <input type="date" id="start-date-input" />
     </div>
     <div class="form-group">
       <label for="end-date-input">End Date</label>
-      <input type="date" id="end-date-input">
+      <input type="date" id="end-date-input" />
     </div>
-    <button id="save-btn">Save Dates</button>
-    <button id="cancel-btn" class="secondary hidden">Cancel</button>
+
+    <button id="save-btn">Save term</button>
+    <div class="button-row">
+      <button id="cancel-btn" class="secondary">Cancel</button>
+      <button id="delete-btn" class="secondary hidden">Delete</button>
+    </div>
   </div>
 
-  <script src="popup.js"></script>
+  <script type="module" src="popup.js"></script>
 </body>
 </html>
