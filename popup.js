@@ -1,6 +1,6 @@
 class SchoolYearTracker {
   constructor() {
-    // Get all DOM elements
+    // Structural DOM Selection Targets
     this.appPanel = document.getElementById('app-panel');
     this.overviewView = document.getElementById('overview-view');
     this.detailsView = document.getElementById('details-view');
@@ -35,10 +35,13 @@ class SchoolYearTracker {
     this.editBtn = document.getElementById('edit-btn');
     this.cancelBtn = document.getElementById('cancel-btn');
     this.deleteBtn = document.getElementById('delete-btn');
+    
+    // Feature #1 DOM Targets
+    this.exportIcsBtn = document.getElementById('export-ics-btn');
+    this.exportCsvBtn = document.getElementById('export-csv-btn');
 
-    // Check if critical elements exist
     if (!this.saveBtn || !this.setupView || !this.appPanel) {
-      console.error('Missing critical UI elements');
+      console.error('Critical interface targets missing instantiation rules.');
       return;
     }
 
@@ -47,7 +50,6 @@ class SchoolYearTracker {
     this.currentTerm = null;
     this.terms = [];
 
-    // Show setup by default while storage loads so the popup is never blank.
     this.appPanel.classList.add('hidden');
     this.setupView.classList.remove('hidden');
 
@@ -56,8 +58,6 @@ class SchoolYearTracker {
   }
 
   attachEventListeners() {
-    if (!this.saveBtn) return;
-    
     this.saveBtn.addEventListener('click', () => this.saveTerm());
     if (this.editBtn) this.editBtn.addEventListener('click', () => this.showSetup());
     if (this.cancelBtn) this.cancelBtn.addEventListener('click', () => this.showOverview());
@@ -68,23 +68,37 @@ class SchoolYearTracker {
     if (this.manageBtn) this.manageBtn.addEventListener('click', () => this.showSetup());
     if (this.overviewTab) this.overviewTab.addEventListener('click', () => this.showOverview());
     if (this.detailsTab) this.detailsTab.addEventListener('click', () => this.showDetails());
+    
+    // Feature #1 Stream Activators
+    if (this.exportIcsBtn) this.exportIcsBtn.addEventListener('click', () => this.exportToIcs());
+    if (this.exportCsvBtn) this.exportCsvBtn.addEventListener('click', () => this.exportToCsv());
   }
 
   loadState() {
-    chrome.storage.local.get(['schoolTerms', 'selectedTermId'], (result) => {
-      const terms = Array.isArray(result.schoolTerms) ? result.schoolTerms : [];
-      this.terms = terms;
-      this.currentTermId = result.selectedTermId || null;
-      this.renderTermOptions();
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.get(['schoolTerms', 'selectedTermId'], (result) => {
+        this.processStoragePayload(result.schoolTerms, result.selectedTermId);
+      });
+    } else {
+      console.warn('Extension storage channel isolated. Initializing Web local storage routing mapping.');
+      const terms = JSON.parse(localStorage.getItem('schoolTerms')) || [];
+      const selectedTermId = localStorage.getItem('selectedTermId') || null;
+      this.processStoragePayload(terms, selectedTermId);
+    }
+  }
 
-      const activeTerm = this.terms.find((term) => term.id === this.currentTermId) || terms[0];
-      if (activeTerm) {
-        this.selectTerm(activeTerm.id);
-        this.showOverview();
-      } else {
-        this.showSetup();
-      }
-    });
+  processStoragePayload(schoolTerms, selectedTermId) {
+    this.terms = Array.isArray(schoolTerms) ? schoolTerms : [];
+    this.currentTermId = selectedTermId || null;
+    this.renderTermOptions();
+
+    const activeTerm = this.terms.find((term) => term.id === this.currentTermId) || this.terms[0];
+    if (activeTerm) {
+      this.selectTerm(activeTerm.id);
+      this.showOverview();
+    } else {
+      this.showSetup();
+    }
   }
 
   generateId() {
@@ -97,14 +111,14 @@ class SchoolYearTracker {
     this.savedTermSelect.innerHTML = '';
     const newOption = document.createElement('option');
     newOption.value = '';
-    newOption.textContent = 'Create new term';
+    newOption.textContent = 'Create new term profile';
     this.savedTermSelect.appendChild(newOption);
 
     if (Array.isArray(this.terms)) {
       this.terms.forEach((term) => {
         const option = document.createElement('option');
         option.value = term.id;
-        option.textContent = `${term.label || 'Untitled term'} (${term.start} to ${term.end})`;
+        option.textContent = `${term.label || 'Untitled Profile'} (${term.start} to ${term.end})`;
         this.savedTermSelect.appendChild(option);
       });
     }
@@ -150,7 +164,12 @@ class SchoolYearTracker {
     }
     this.currentTerm = selectedTerm;
     this.currentTermId = selectedTerm.id;
-    chrome.storage.local.set({ selectedTermId: selectedTerm.id });
+
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.set({ selectedTermId: selectedTerm.id });
+    } else {
+      localStorage.setItem('selectedTermId', selectedTerm.id);
+    }
     this.updateDeleteVisibility();
   }
 
@@ -159,7 +178,6 @@ class SchoolYearTracker {
     const start = this.startDateInput.value;
     const end = this.endDateInput.value;
     
-    // Clean up comma-separated strings into a nice clean array
     const holidaysRaw = this.holidaysInput ? this.holidaysInput.value : '';
     const holidayArray = holidaysRaw
       .split(',')
@@ -167,14 +185,14 @@ class SchoolYearTracker {
       .filter(date => date.length > 0);
 
     if (!start || !end) {
-      alert('Please choose both a start date and an end date.');
+      alert('Operational constraints require absolute boundary entries.');
       return;
     }
 
     const startDate = new Date(`${start}T00:00:00`);
     const endDate = new Date(`${end}T00:00:00`);
     if (startDate >= endDate) {
-      alert('End date must be later than the start date.');
+      alert('Chronological error: Terminators must exceed initialization targets.');
       return;
     }
 
@@ -183,7 +201,7 @@ class SchoolYearTracker {
       label,
       start,
       end,
-      holidays: holidayArray, // <-- This saves the holidays inside the term object
+      holidays: holidayArray,
       createdAt: new Date().toISOString(),
     };
 
@@ -196,28 +214,35 @@ class SchoolYearTracker {
 
     this.currentTerm = term;
     this.currentTermId = term.id;
-    chrome.storage.local.set({ schoolTerms: this.terms, selectedTermId: term.id }, () => {
+
+    const dataPayload = { schoolTerms: this.terms, selectedTermId: term.id };
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.set(dataPayload, () => {
+        this.renderTermOptions();
+        this.showOverview();
+      });
+    } else {
+      localStorage.setItem('schoolTerms', JSON.stringify(this.terms));
+      localStorage.setItem('selectedTermId', term.id);
       this.renderTermOptions();
       this.showOverview();
-    });
+    }
   }
 
   deleteCurrentTerm() {
-    if (!this.currentTerm) {
-      return;
-    }
+    if (!this.currentTerm) return;
 
-    const confirmed = confirm('Delete this saved term?');
-    if (!confirmed) {
-      return;
-    }
+    const confirmed = confirm('Purge selected structural active term configuration profile?');
+    if (!confirmed) return;
 
     this.terms = this.terms.filter((term) => term.id !== this.currentTerm.id);
     this.currentTerm = null;
     this.currentTermId = null;
 
     const selectedTermId = this.terms.length ? this.terms[0].id : null;
-    chrome.storage.local.set({ schoolTerms: this.terms, selectedTermId }, () => {
+    const writeData = { schoolTerms: this.terms, selectedTermId };
+
+    const finalizeCallback = () => {
       this.currentTermId = selectedTermId;
       this.renderTermOptions();
       if (selectedTermId) {
@@ -226,21 +251,15 @@ class SchoolYearTracker {
       } else {
         this.showSetup();
       }
-    });
-  }
+    };
 
-  clearSavedTerms() {
-    const confirmed = confirm('Remove all saved terms and reset the tracker?');
-    if (!confirmed) {
-      return;
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.set(writeData, finalizeCallback);
+    } else {
+      localStorage.setItem('schoolTerms', JSON.stringify(this.terms));
+      localStorage.setItem('selectedTermId', selectedTermId || '');
+      finalizeCallback();
     }
-
-    this.terms = [];
-    this.currentTerm = null;
-    this.currentTermId = null;
-    chrome.storage.local.clear(() => {
-      this.showSetup();
-    });
   }
 
   showOverview() {
@@ -255,13 +274,11 @@ class SchoolYearTracker {
     this.detailsView.classList.add('hidden');
     this.selectTab('overview');
     this.renderTracker();
-    this.startTimer();
+    this.startTimer(); // Lifecycle Reactivation
   }
 
   showDetails() {
-    if (!this.currentTerm) {
-      return;
-    }
+    if (!this.currentTerm) return;
 
     this.setupView.classList.add('hidden');
     this.appPanel.classList.remove('hidden');
@@ -269,6 +286,7 @@ class SchoolYearTracker {
     this.detailsView.classList.remove('hidden');
     this.selectTab('details');
     this.renderTracker();
+    this.stopTimer(); // Feature #3 Performance Allocation Optimization
   }
 
   selectTab(tab) {
@@ -276,7 +294,8 @@ class SchoolYearTracker {
     if (this.detailsTab) this.detailsTab.classList.toggle('active', tab === 'details');
   }
 
- showSetup() {
+  showSetup() {
+    this.stopTimer(); // Feature #3 Resource Safety Release
     this.appPanel.classList.add('hidden');
     this.setupView.classList.remove('hidden');
 
@@ -297,24 +316,20 @@ class SchoolYearTracker {
   }
 
   startTimer() {
-    if (this.timerId) {
-      clearTimeout(this.timerId);
-    }
+    if (this.timerId) clearTimeout(this.timerId);
     this.updateTracker();
   }
 
   stopTimer() {
     if (this.timerId) {
       clearTimeout(this.timerId);
+      this.timerId = null;
     }
   }
 
   renderTracker() {
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     this.termLabel.textContent = this.currentTerm.label;
-    this.displayStart.textContent = new Date(`${this.currentTerm.start}T00:00:00`).toLocaleDateString(undefined, options);
-    this.displayEnd.textContent = new Date(`${this.currentTerm.end}T00:00:00`).toLocaleDateString(undefined, options);
-    this.statusLabel.textContent = 'Live progress for your current academic term';
     this.updateDetails();
   }
 
@@ -342,9 +357,7 @@ class SchoolYearTracker {
   }
 
   updateTracker() {
-    if (!this.currentTerm) {
-      return;
-    }
+    if (!this.currentTerm) return;
 
     const now = new Date();
     const startDate = new Date(`${this.currentTerm.start}T00:00:00`);
@@ -366,6 +379,8 @@ class SchoolYearTracker {
       this.timeRemaining.textContent = 'Complete';
       this.businessDaysLeft.textContent = '0 remaining';
       this.resultDiv.textContent = `Progress: 100.00%`;
+      this.stopTimer();
+      return;
     } else {
       this.statusLabel.textContent = 'Term is in progress.';
       this.timeRemaining.textContent = this.formatDuration(remainingMs) + ' left';
@@ -374,7 +389,11 @@ class SchoolYearTracker {
     }
 
     this.renderMilestones(startDate, endDate, now);
-    this.timerId = setTimeout(() => this.updateTracker(), 1000);
+    
+    // Self-corrective conditional checking to avoid setting orphan execution timeouts
+    if (this.overviewView && !this.overviewView.classList.contains('hidden')) {
+      this.timerId = setTimeout(() => this.updateTracker(), 1000);
+    }
   }
 
   renderMilestones(startDate, endDate, now) {
@@ -442,7 +461,6 @@ class SchoolYearTracker {
     while (start < end) {
       const day = start.getDay();
       
-      // Formats current day pointer to match input text format "YYYY-MM-DD"
       const yyyy = start.getFullYear();
       const mm = String(start.getMonth() + 1).padStart(2, '0');
       const dd = String(start.getDate()).padStart(2, '0');
@@ -451,13 +469,80 @@ class SchoolYearTracker {
       const isWeekend = (day === 0 || day === 6);
       const isHoliday = termHolidays.includes(dateString);
 
-      // Only count the day if it's not a weekend AND not a custom holiday
       if (!isWeekend && !isHoliday) {
         count += 1;
       }
       start.setDate(start.getDate() + 1);
     }
     return count;
+  }
+
+  // Feature #1: Zero-Dependency iCalendar Engine Export Implementation
+  exportToIcs() {
+    if (!this.currentTerm) return;
+    
+    const startIso = this.currentTerm.start.replace(/-/g, '');
+    const endIso = this.currentTerm.end.replace(/-/g, '');
+    const timestamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    
+    // Formulate RFC 5545 structured string format without third party bundles
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Academic Tracker//NONSGML v1.0//EN',
+      'BEGIN:VEVENT',
+      `UID:term-${this.currentTerm.id}@academic.tracker`,
+      `DTSTAMP:${timestamp}`,
+      `DTSTART;VALUE=DATE:${startIso}`,
+      `DTEND;VALUE=DATE:${endIso}`,
+      `SUMMARY:${this.currentTerm.label}`,
+      'DESCRIPTION:Academic term boundaries generated via tracking platform profiles.',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    this.triggerDataStreamDownload(icsContent, `${this.currentTerm.label.toLowerCase().replace(/\s+/g, '_')}_bounds.ics`, 'text/calendar');
+  }
+
+  // Feature #1: Dynamic Analytics Text Data Grid Compilation Export
+  exportToCsv() {
+    if (!this.currentTerm) return;
+
+    const startDate = new Date(`${this.currentTerm.start}T00:00:00`);
+    const endDate = new Date(`${this.currentTerm.end}T00:00:00`);
+    
+    const totalDays = this.countDays(startDate, endDate);
+    const activeBusinessDays = this.countBusinessDays(startDate, endDate);
+    
+    const csvRows = [
+      ['Metric Variable Descriptor', 'Profile Configuration Matrix Output Value'],
+      ['Term Label Profile Identifier', this.currentTerm.label],
+      ['Execution Bound Date Initialization', this.currentTerm.start],
+      ['Execution Bound Date Termination', this.currentTerm.end],
+      ['Gross Calendar Delta Span Count', `${totalDays} Days`],
+      ['Net Filtered Active Business Operating Framework Days', `${activeBusinessDays} Days`],
+      ['Registered Custom Holiday Date Exclusion Boundaries', (this.currentTerm.holidays || []).join('; ') || 'None']
+    ];
+
+    const csvContent = csvRows.map(row => row.map(value => `"${value.replace(/"/g, '""')}"`).join(',')).join('\n');
+    this.triggerDataStreamDownload(csvContent, `${this.currentTerm.label.toLowerCase().replace(/\s+/g, '_')}_analytics_snapshot.csv`, 'text/csv;charset=utf-8;');
+  }
+
+  triggerDataStreamDownload(content, filename, contentType) {
+    const blob = new Blob([content], { type: contentType });
+    const downloadUrl = URL.createObjectURL(blob);
+    const structuralLinkElement = document.createElement('a');
+    
+    structuralLinkElement.href = downloadUrl;
+    structuralLinkElement.download = filename;
+    structuralLinkElement.style.display = 'none';
+    
+    document.body.appendChild(structuralLinkElement);
+    structuralLinkElement.click();
+    
+    // Explicit garbage collection cleaning memory links immediately after processing loop completion
+    document.body.removeChild(structuralLinkElement);
+    URL.revokeObjectURL(downloadUrl);
   }
 }
 

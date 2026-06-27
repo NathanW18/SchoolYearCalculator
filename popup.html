@@ -1,405 +1,94 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>School Year Tracker</title>
-  <style>
-    :root {
-      color-scheme: light;
-      font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      color: #1a2332;
-    }
-
-    body {
-      width: 360px;
-      min-height: 450px;
-      padding: 20px;
-      margin: 0;
-      box-sizing: border-box;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    }
-
-    .panel {
-      background: #ffffff;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(26, 35, 50, 0.15);
-      padding: 24px;
-      display: grid;
-      gap: 20px;
-    }
-
-    .title {
-      margin: 0;
-      font-size: 1.3rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: #1a2332;
-    }
-
-    .subtitle {
-      margin: 6px 0 0;
-      color: #6b7c93;
-      font-size: 0.95rem;
-      font-weight: 500;
-    }
-
-    .progress-bar {
-      width: 100%;
-      height: 24px;
-      background-color: #e8ecf1;
-      border-radius: 999px;
-      overflow: hidden;
-      margin-top: 12px;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    .progress-fill {
-      height: 100%;
-      width: 0;
-      background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-      transition: width 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
-      box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-
-    .stat {
-      background: linear-gradient(135deg, #f5f8fc 0%, #f0f3f8 100%);
-      padding: 16px;
-      border-radius: 16px;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      border: 1px solid rgba(102, 126, 234, 0.1);
-      transition: all 0.2s ease;
-    }
-
-    .stat:hover {
-      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.12);
-      transform: translateY(-2px);
-    }
-
-    .stat strong {
-      display: block;
-      margin-bottom: 6px;
-      color: #1a2332;
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .stat span {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #667eea;
-    }
-
-    .milestone-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: grid;
-      gap: 10px;
-    }
-
-    .milestone-list li {
-      font-size: 0.9rem;
-      color: #3f5070;
-      padding: 12px 14px;
-      background: linear-gradient(135deg, #f5f8fc 0%, #f0f3f8 100%);
-      border-radius: 12px;
-      border-left: 3px solid #667eea;
-      transition: all 0.2s ease;
-    }
-
-    .milestone-list li:hover {
-      transform: translateX(2px);
-      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
-    }
-
-    .milestone-list strong {
-      color: #1a2332;
-      font-weight: 700;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .form-group {
-      display: grid;
-      gap: 8px;
-      margin-bottom: 4px;
-    }
-
-    label {
-      font-size: 0.9rem;
-      color: #3f5070;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    input,
-    select {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 14px;
-      border: 2px solid #e8ecf1;
-      background: #fafbfc;
-      font-size: 0.95rem;
-      color: #1a2332;
-      box-sizing: border-box;
-      font-family: 'Open Sans', sans-serif;
-      transition: all 0.2s ease;
-    }
-
-    input:focus,
-    select:focus {
-      outline: none;
-      border-color: #667eea;
-      background: #fff;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    button {
-      width: 100%;
-      border: none;
-      border-radius: 14px;
-      padding: 13px 16px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      color: #fff;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-      margin-top: 8px;
-    }
-
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-    }
-
-    button:active {
-      transform: translateY(0);
-    }
-
-    button.secondary {
-      background: linear-gradient(135deg, #6b7c93 0%, #5a6878 100%);
-      box-shadow: 0 2px 8px rgba(107, 124, 147, 0.2);
-    }
-
-    button.secondary:hover {
-      box-shadow: 0 4px 16px rgba(107, 124, 147, 0.3);
-    }
-
-    .button-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 12px;
-    }
-
-    .header-row {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 4px;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 6px;
-      background: #f5f8fc;
-      padding: 4px;
-      border-radius: 12px;
-    }
-
-    .tab {
-      border: none;
-      border-radius: 10px;
-      padding: 7px 14px;
-      background: transparent;
-      color: #6b7c93;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.85rem;
-      transition: all 0.2s ease;
-    }
-
-    .tab:hover {
-      color: #667eea;
-    }
-
-    .tab.active {
-      background: #fff;
-      color: #667eea;
-      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.12);
-    }
-
-    .chip-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 12px 0;
-    }
-
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #f5f8fc 0%, #f0f3f8 100%);
-      color: #1a2332;
-      font-size: 0.85rem;
-      font-weight: 600;
-      border: 1px solid rgba(102, 126, 234, 0.15);
-    }
-
-    .status-chip {
-      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-      color: #155724;
-      border-color: rgba(21, 87, 36, 0.2);
-    }
-
-    .section-title {
-      margin: 16px 0 12px;
-      font-size: 1rem;
-      font-weight: 800;
-      letter-spacing: -0.3px;
-      color: #1a2332;
-    }
-  </style>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <div id="app-panel" class="panel hidden">
-    <div class="header-row">
-      <div>
-        <p class="title" id="app-title">School Year Tracker</p>
-        <p class="subtitle" id="app-subtitle">Live progress for your current academic term</p>
+
+  <div id="app-panel" class="view-container">
+    <div class="tabs">
+      <button id="overview-tab" class="tab-btn">Overview</button>
+      <button id="details-tab" class="tab-btn">Details</button>
+    </div>
+
+    <div id="overview-view" class="view-content">
+      <h2 id="term-label">Academic Term</h2>
+      <p id="status-label">Initializing state...</p>
+      
+      <div class="progress-container">
+        <div id="progressFill" class="progress-bar"></div>
       </div>
-      <div class="tabs">
-        <button id="overview-tab" class="tab active">Overview</button>
-        <button id="details-tab" class="tab">Details</button>
+      
+      <div id="result" class="metric-highlight">Progress: 0.00%</div>
+      <div id="time-remaining" class="time-callout">0d 0h 0m 0s left</div>
+      
+      <div class="metric-group">
+        <span class="label">Business Days Remaining:</span>
+        <span id="business-days-left" class="value">0 remaining</span>
+      </div>
+
+      <div class="action-row">
+        <button id="details-button">View Details</button>
+        <button id="manage-btn">Configure Settings</button>
       </div>
     </div>
 
-    <div id="overview-view">
-      <div class="progress-bar" aria-label="Progress">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
+    <div id="details-view" class="view-content">
+      <h3>Term Metrics</h3>
+      <ul class="metrics-list">
+        <li><strong>Total Calendar Span:</strong> <span id="total-days">0 days</span></li>
+        <li><strong>Elapsed Range Delta:</strong> <span id="elapsed-days">0 days</span></li>
+        <li><strong>Term Midpoint Target:</strong> <span id="halfway-date">-</span></li>
+      </ul>
 
-      <div class="chip-row">
-        <span class="chip" id="term-label">Current term</span>
-        <span class="chip status-chip" id="status-label">In progress</span>
-      </div>
+      <h4>Milestone Markers</h4>
+      <ul id="milestones" class="milestones-box"></ul>
 
-      <div class="stats-grid">
-        <div class="stat">
-          <strong>Start</strong>
-          <span id="display-start"></span>
-        </div>
-        <div class="stat">
-          <strong>End</strong>
-          <span id="display-end"></span>
-        </div>
-        <div class="stat">
-          <strong>Remaining</strong>
-          <span id="time-remaining"></span>
-        </div>
-        <div class="stat">
-          <strong>Progress</strong>
-          <span id="result"></span>
-        </div>
-      </div>
-
-      <div class="button-row">
-        <button id="details-button" class="secondary">View details</button>
-        <button id="edit-btn">Edit</button>
-      </div>
-    </div>
-
-    <div id="details-view" class="hidden">
-      <div class="section-title">Term snapshot</div>
-      <div class="stats-grid">
-        <div class="stat">
-          <strong>Total days</strong>
-          <span id="total-days"></span>
-        </div>
-        <div class="stat">
-          <strong>Days elapsed</strong>
-          <span id="elapsed-days"></span>
-        </div>
-        <div class="stat">
-          <strong>Business days left</strong>
-          <span id="business-days-left"></span>
-        </div>
-        <div class="stat">
-          <strong>Halfway at</strong>
-          <span id="halfway-date"></span>
-        </div>
-      </div>
-
-      <div class="section-title">Milestones & insights</div>
-      <ul class="milestone-list" id="milestones"></ul>
-
-      <div class="button-row">
-        <button id="back-button" class="secondary">Back</button>
-        <button id="manage-btn" class="secondary">Manage terms</button>
+      <div class="action-row">
+        <button id="back-button">Back to Overview</button>
+        <button id="export-ics-btn" class="secondary-btn">Export to Calendar (.ics)</button>
+        <button id="export-csv-btn" class="secondary-btn">Export Metrics (.csv)</button>
       </div>
     </div>
   </div>
 
-  <div id="setup-view" class="panel">
-    <div>
-      <p class="title">Configure School Year</p>
-      <p class="subtitle">Use saved terms or create a custom schedule.</p>
-    </div>
-
+  <div id="setup-view" class="view-container">
+    <h2>Configure Academic Term</h2>
+    
     <div class="form-group">
-      <label for="saved-term-select">Saved term</label>
+      <label for="saved-term-select">Load Saved Profile</label>
       <select id="saved-term-select"></select>
     </div>
 
     <div class="form-group">
-      <label for="term-label-input">Term name</label>
-      <input type="text" id="term-label-input" placeholder="Fall 2026, Spring Semester, etc." />
+      <label for="term-label-input">Term Identifier Label</label>
+      <input type="text" id="term-label-input" placeholder="e.g., Fall Semester 2026">
+    </div>
+
+    <div class="form-group-row">
+      <div class="form-group">
+        <label for="start-date-input">Start Boundary Date</label>
+        <input type="date" id="start-date-input">
+      </div>
+      <div class="form-group">
+        <label for="end-date-input">End Boundary Date</label>
+        <input type="date" id="end-date-input">
+      </div>
     </div>
 
     <div class="form-group">
-      <label for="start-date-input">Start Date</label>
-      <input type="date" id="start-date-input" />
-    </div>
-    <div class="form-group">
-      <label for="end-date-input">End Date</label>
-      <input type="date" id="end-date-input" />
+      <label for="holidays-input">Exclusion Breaks & Holidays (Optional)</label>
+      <input type="text" id="holidays-input" placeholder="YYYY-MM-DD, YYYY-MM-DD">
+      <small class="help-text">Separate absolute calendar targets with commas.</small>
     </div>
 
-    <div class="form-group" style="margin-bottom: 15px;">
-  <label for="holidays-input" style="display: block; font-weight: bold; margin-bottom: 5px;">Exclusion Dates / Holidays (Optional)</label>
-  <input 
-    type="text" 
-    id="holidays-input" 
-    placeholder="YYYY-MM-DD, YYYY-MM-DD" 
-    style="width: 100%; padding: 6px; box-sizing: border-box;"
-  />
-  <small style="color: #666; display: block; margin-top: 4px; font-size: 11px;">
-    Separate dates with commas (e.g., 2026-12-25, 2026-12-26)
-  </small>
-</div>
-
-    <button id="save-btn">Save term</button>
-    <div class="button-row">
-      <button id="cancel-btn" class="secondary">Cancel</button>
-      <button id="delete-btn" class="secondary hidden">Delete</button>
+    <div class="button-grid">
+      <button id="save-btn" class="primary-btn">Save & Activate</button>
+      <button id="cancel-btn">Cancel</button>
+      <button id="edit-btn" class="hidden">Modify Current</button>
+      <button id="delete-btn" class="danger-btn hidden">Delete Profile</button>
     </div>
   </div>
 
