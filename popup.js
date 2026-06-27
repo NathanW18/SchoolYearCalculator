@@ -103,7 +103,7 @@ class SchoolYearTracker {
       this.terms.forEach((term) => {
         const option = document.createElement('option');
         option.value = term.id;
-        option.textContent = `${term.label || 'Untitled term'} (${term.start} → ${term.end})`;
+        option.textContent = `${term.label || 'Untitled term'} (${term.start} to ${term.end})`;
         this.savedTermSelect.appendChild(option);
       });
     }
