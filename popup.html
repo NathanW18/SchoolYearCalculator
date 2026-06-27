@@ -143,52 +143,143 @@
       grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: #eef2f8;
+      color: #4b5f83;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, #3f8ee3 0%, #44c485 100%);
+      color: #fff;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #f5f8ff;
+      color: #2f436e;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .status-chip {
+      background: #eafbf0;
+      color: #227a38;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      color: #273250;
+    }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div id="tracker-view" class="panel hidden">
-    <div>
-      <p class="title" id="term-label">School Year Tracker</p>
-      <p class="subtitle" id="status-label">Live progress for your current academic term</p>
-    </div>
-
-    <div class="progress-bar" aria-label="Progress">
-      <div class="progress-fill" id="progressFill"></div>
-    </div>
-
-    <div class="stats-grid">
-      <div class="stat">
-        <strong>Start</strong>
-        <span id="display-start"></span>
+  <div id="app-panel" class="panel hidden">
+    <div class="header-row">
+      <div>
+        <p class="title" id="app-title">School Year Tracker</p>
+        <p class="subtitle" id="app-subtitle">Live progress for your current academic term</p>
       </div>
-      <div class="stat">
-        <strong>End</strong>
-        <span id="display-end"></span>
-      </div>
-      <div class="stat">
-        <strong>Time remaining</strong>
-        <span id="time-remaining"></span>
-      </div>
-      <div class="stat">
-        <strong>Business days left</strong>
-        <span id="business-days-left"></span>
+      <div class="tabs">
+        <button id="overview-tab" class="tab active">Overview</button>
+        <button id="details-tab" class="tab">Details</button>
       </div>
     </div>
 
-    <div class="stat">
-      <strong>Progress</strong>
-      <span id="result"></span>
+    <div id="overview-view">
+      <div class="progress-bar" aria-label="Progress">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <div class="chip-row">
+        <span class="chip" id="term-label">Current term</span>
+        <span class="chip status-chip" id="status-label">In progress</span>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat">
+          <strong>Start</strong>
+          <span id="display-start"></span>
+        </div>
+        <div class="stat">
+          <strong>End</strong>
+          <span id="display-end"></span>
+        </div>
+        <div class="stat">
+          <strong>Remaining</strong>
+          <span id="time-remaining"></span>
+        </div>
+        <div class="stat">
+          <strong>Progress</strong>
+          <span id="result"></span>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button id="details-button" class="secondary">View details</button>
+        <button id="edit-btn">Edit</button>
+      </div>
     </div>
 
-    <div>
-      <strong>Milestones</strong>
+    <div id="details-view" class="hidden">
+      <div class="section-title">Term snapshot</div>
+      <div class="stats-grid">
+        <div class="stat">
+          <strong>Total days</strong>
+          <span id="total-days"></span>
+        </div>
+        <div class="stat">
+          <strong>Days elapsed</strong>
+          <span id="elapsed-days"></span>
+        </div>
+        <div class="stat">
+          <strong>Business days left</strong>
+          <span id="business-days-left"></span>
+        </div>
+        <div class="stat">
+          <strong>Halfway at</strong>
+          <span id="halfway-date"></span>
+        </div>
+      </div>
+
+      <div class="section-title">Milestones & insights</div>
       <ul class="milestone-list" id="milestones"></ul>
-    </div>
 
-    <div class="button-row">
-      <button id="edit-btn">Edit</button>
-      <button id="clear-btn" class="secondary">Clear</button>
+      <div class="button-row">
+        <button id="back-button" class="secondary">Back</button>
+        <button id="manage-btn" class="secondary">Manage terms</button>
+      </div>
     </div>
   </div>
 

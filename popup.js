@@ -1,7 +1,15 @@
 class SchoolYearTracker {
   constructor() {
-    this.trackerView = document.getElementById('tracker-view');
+    this.appPanel = document.getElementById('app-panel');
+    this.overviewView = document.getElementById('overview-view');
+    this.detailsView = document.getElementById('details-view');
     this.setupView = document.getElementById('setup-view');
+
+    this.overviewTab = document.getElementById('overview-tab');
+    this.detailsTab = document.getElementById('details-tab');
+    this.detailsButton = document.getElementById('details-button');
+    this.backButton = document.getElementById('back-button');
+    this.manageBtn = document.getElementById('manage-btn');
 
     this.displayStart = document.getElementById('display-start');
     this.displayEnd = document.getElementById('display-end');
@@ -12,6 +20,9 @@ class SchoolYearTracker {
     this.milestonesList = document.getElementById('milestones');
     this.termLabel = document.getElementById('term-label');
     this.statusLabel = document.getElementById('status-label');
+    this.totalDays = document.getElementById('total-days');
+    this.elapsedDays = document.getElementById('elapsed-days');
+    this.halfwayDate = document.getElementById('halfway-date');
 
     this.startDateInput = document.getElementById('start-date-input');
     this.endDateInput = document.getElementById('end-date-input');
@@ -36,9 +47,14 @@ class SchoolYearTracker {
     this.saveBtn.addEventListener('click', () => this.saveTerm());
     this.editBtn.addEventListener('click', () => this.showSetup());
     this.clearBtn.addEventListener('click', () => this.clearSavedTerms());
-    this.cancelBtn.addEventListener('click', () => this.showTracker());
+    this.cancelBtn.addEventListener('click', () => this.showSetup());
     this.deleteBtn.addEventListener('click', () => this.deleteCurrentTerm());
     this.savedTermSelect.addEventListener('change', () => this.loadSelectedTerm());
+    this.detailsButton.addEventListener('click', () => this.showDetails());
+    this.backButton.addEventListener('click', () => this.showOverview());
+    this.manageBtn.addEventListener('click', () => this.showSetup());
+    this.overviewTab.addEventListener('click', () => this.showOverview());
+    this.detailsTab.addEventListener('click', () => this.showDetails());
   }
 
   loadState() {
@@ -51,7 +67,7 @@ class SchoolYearTracker {
       const activeTerm = this.terms.find((term) => term.id === this.currentTermId) || terms[0];
       if (activeTerm) {
         this.selectTerm(activeTerm.id);
-        this.showTracker();
+        this.showOverview();
       } else {
         this.showSetup();
       }
@@ -199,20 +215,41 @@ class SchoolYearTracker {
     });
   }
 
-  showTracker() {
+  showOverview() {
     if (!this.currentTerm) {
       this.showSetup();
       return;
     }
 
     this.setupView.classList.add('hidden');
-    this.trackerView.classList.remove('hidden');
+    this.appPanel.classList.remove('hidden');
+    this.overviewView.classList.remove('hidden');
+    this.detailsView.classList.add('hidden');
+    this.selectTab('overview');
     this.renderTracker();
     this.startTimer();
   }
 
+  showDetails() {
+    if (!this.currentTerm) {
+      return;
+    }
+
+    this.setupView.classList.add('hidden');
+    this.appPanel.classList.remove('hidden');
+    this.overviewView.classList.add('hidden');
+    this.detailsView.classList.remove('hidden');
+    this.selectTab('details');
+    this.renderTracker();
+  }
+
+  selectTab(tab) {
+    this.overviewTab.classList.toggle('active', tab === 'overview');
+    this.detailsTab.classList.toggle('active', tab === 'details');
+  }
+
   showSetup() {
-    this.trackerView.classList.add('hidden');
+    this.appPanel.classList.add('hidden');
     this.setupView.classList.remove('hidden');
 
     if (this.currentTerm) {
@@ -249,6 +286,30 @@ class SchoolYearTracker {
     this.displayStart.textContent = new Date(`${this.currentTerm.start}T00:00:00`).toLocaleDateString(undefined, options);
     this.displayEnd.textContent = new Date(`${this.currentTerm.end}T00:00:00`).toLocaleDateString(undefined, options);
     this.statusLabel.textContent = 'Live progress for your current academic term';
+    this.updateDetails();
+  }
+
+  updateDetails() {
+    const startDate = new Date(`${this.currentTerm.start}T00:00:00`);
+    const endDate = new Date(`${this.currentTerm.end}T00:00:00`);
+    const totalDays = this.countDays(startDate, endDate);
+    const elapsed = this.countDays(startDate, new Date(Math.min(Date.now(), endDate))); 
+    const midpoint = new Date((startDate.getTime() + endDate.getTime()) / 2);
+
+    this.totalDays.textContent = `${totalDays} days`;
+    this.elapsedDays.textContent = `${elapsed} days`;
+    this.halfwayDate.textContent = midpoint.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
+
+  countDays(startDate, endDate) {
+    const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+    let count = 0;
+    while (start < end) {
+      count += 1;
+      start.setDate(start.getDate() + 1);
+    }
+    return count;
   }
 
   updateTracker() {
