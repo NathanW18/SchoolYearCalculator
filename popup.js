@@ -1,5 +1,6 @@
 class SchoolYearTracker {
   constructor() {
+    // Get all DOM elements
     this.appPanel = document.getElementById('app-panel');
     this.overviewView = document.getElementById('overview-view');
     this.detailsView = document.getElementById('details-view');
@@ -31,13 +32,19 @@ class SchoolYearTracker {
 
     this.saveBtn = document.getElementById('save-btn');
     this.editBtn = document.getElementById('edit-btn');
-    this.clearBtn = document.getElementById('clear-btn');
     this.cancelBtn = document.getElementById('cancel-btn');
     this.deleteBtn = document.getElementById('delete-btn');
+
+    // Check if critical elements exist
+    if (!this.saveBtn || !this.setupView || !this.appPanel) {
+      console.error('Missing critical UI elements');
+      return;
+    }
 
     this.timerId = null;
     this.currentTermId = null;
     this.currentTerm = null;
+    this.terms = [];
 
     // Show setup by default while storage loads so the popup is never blank.
     this.appPanel.classList.add('hidden');
@@ -48,17 +55,18 @@ class SchoolYearTracker {
   }
 
   attachEventListeners() {
+    if (!this.saveBtn) return;
+    
     this.saveBtn.addEventListener('click', () => this.saveTerm());
-    this.editBtn.addEventListener('click', () => this.showSetup());
-    this.clearBtn.addEventListener('click', () => this.clearSavedTerms());
-    this.cancelBtn.addEventListener('click', () => this.showOverview());
-    this.deleteBtn.addEventListener('click', () => this.deleteCurrentTerm());
-    this.savedTermSelect.addEventListener('change', () => this.loadSelectedTerm());
-    this.detailsButton.addEventListener('click', () => this.showDetails());
-    this.backButton.addEventListener('click', () => this.showOverview());
-    this.manageBtn.addEventListener('click', () => this.showSetup());
-    this.overviewTab.addEventListener('click', () => this.showOverview());
-    this.detailsTab.addEventListener('click', () => this.showDetails());
+    if (this.editBtn) this.editBtn.addEventListener('click', () => this.showSetup());
+    if (this.cancelBtn) this.cancelBtn.addEventListener('click', () => this.showOverview());
+    if (this.deleteBtn) this.deleteBtn.addEventListener('click', () => this.deleteCurrentTerm());
+    if (this.savedTermSelect) this.savedTermSelect.addEventListener('change', () => this.loadSelectedTerm());
+    if (this.detailsButton) this.detailsButton.addEventListener('click', () => this.showDetails());
+    if (this.backButton) this.backButton.addEventListener('click', () => this.showOverview());
+    if (this.manageBtn) this.manageBtn.addEventListener('click', () => this.showSetup());
+    if (this.overviewTab) this.overviewTab.addEventListener('click', () => this.showOverview());
+    if (this.detailsTab) this.detailsTab.addEventListener('click', () => this.showDetails());
   }
 
   loadState() {
@@ -83,24 +91,29 @@ class SchoolYearTracker {
   }
 
   renderTermOptions() {
+    if (!this.savedTermSelect) return;
+    
     this.savedTermSelect.innerHTML = '';
     const newOption = document.createElement('option');
     newOption.value = '';
     newOption.textContent = 'Create new term';
     this.savedTermSelect.appendChild(newOption);
 
-    this.terms.forEach((term) => {
-      const option = document.createElement('option');
-      option.value = term.id;
-      option.textContent = `${term.label || 'Untitled term'} (${term.start} → ${term.end})`;
-      this.savedTermSelect.appendChild(option);
-    });
+    if (Array.isArray(this.terms)) {
+      this.terms.forEach((term) => {
+        const option = document.createElement('option');
+        option.value = term.id;
+        option.textContent = `${term.label || 'Untitled term'} (${term.start} → ${term.end})`;
+        this.savedTermSelect.appendChild(option);
+      });
+    }
 
     this.savedTermSelect.value = this.currentTermId || '';
     this.updateDeleteVisibility();
   }
 
   updateDeleteVisibility() {
+    if (!this.deleteBtn) return;
     const showDelete = !!this.currentTerm && !!this.currentTerm.id;
     this.deleteBtn.classList.toggle('hidden', !showDelete);
   }
@@ -248,8 +261,8 @@ class SchoolYearTracker {
   }
 
   selectTab(tab) {
-    this.overviewTab.classList.toggle('active', tab === 'overview');
-    this.detailsTab.classList.toggle('active', tab === 'details');
+    if (this.overviewTab) this.overviewTab.classList.toggle('active', tab === 'overview');
+    if (this.detailsTab) this.detailsTab.classList.toggle('active', tab === 'details');
   }
 
   showSetup() {

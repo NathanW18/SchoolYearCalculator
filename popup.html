@@ -5,75 +5,97 @@
   <style>
     :root {
       color-scheme: light;
-      font-family: 'Open Sans', sans-serif;
-      background: #eef2f8;
-      color: #111;
+      font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      color: #1a2332;
     }
 
     body {
-      width: 340px;
-      min-height: 420px;
-      padding: 18px;
+      width: 360px;
+      min-height: 450px;
+      padding: 20px;
       margin: 0;
       box-sizing: border-box;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     }
 
     .panel {
       background: #ffffff;
-      border-radius: 18px;
-      box-shadow: 0 16px 40px rgba(25, 43, 77, 0.12);
-      padding: 18px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(26, 35, 50, 0.15);
+      padding: 24px;
       display: grid;
-      gap: 16px;
+      gap: 18px;
     }
 
     .title {
       margin: 0;
-      font-size: 1.1rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #1a2332;
     }
 
     .subtitle {
-      margin: 4px 0 0;
-      color: #555;
-      font-size: 0.9rem;
+      margin: 6px 0 0;
+      color: #6b7c93;
+      font-size: 0.95rem;
+      font-weight: 500;
     }
 
     .progress-bar {
       width: 100%;
-      height: 16px;
-      background-color: #f0f4fb;
+      height: 24px;
+      background-color: #e8ecf1;
       border-radius: 999px;
       overflow: hidden;
-      margin-top: 10px;
+      margin-top: 12px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .progress-fill {
       height: 100%;
       width: 0;
-      background: linear-gradient(135deg, #3f8ee3 0%, #44c485 100%);
-      transition: width 0.3s ease;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      transition: width 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+      box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
     }
 
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
     }
 
     .stat {
-      background: #f6f8ff;
-      padding: 12px;
-      border-radius: 14px;
+      background: linear-gradient(135deg, #f5f8fc 0%, #f0f3f8 100%);
+      padding: 16px;
+      border-radius: 16px;
       font-size: 0.9rem;
-      line-height: 1.4;
+      line-height: 1.5;
+      border: 1px solid rgba(102, 126, 234, 0.1);
+      transition: all 0.2s ease;
+    }
+
+    .stat:hover {
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.12);
+      transform: translateY(-2px);
     }
 
     .stat strong {
       display: block;
-      margin-bottom: 4px;
-      color: #1f2d4d;
+      margin-bottom: 6px;
+      color: #1a2332;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat span {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #667eea;
     }
 
     .milestone-list {
@@ -81,12 +103,27 @@
       padding: 0;
       margin: 0;
       display: grid;
-      gap: 6px;
+      gap: 10px;
     }
 
     .milestone-list li {
-      font-size: 0.86rem;
-      color: #3d4a6b;
+      font-size: 0.9rem;
+      color: #3f5070;
+      padding: 12px 14px;
+      background: linear-gradient(135deg, #f5f8fc 0%, #f0f3f8 100%);
+      border-radius: 12px;
+      border-left: 3px solid #667eea;
+      transition: all 0.2s ease;
+    }
+
+    .milestone-list li:hover {
+      transform: translateX(2px);
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+    }
+
+    .milestone-list strong {
+      color: #1a2332;
+      font-weight: 700;
     }
 
     .hidden {
@@ -95,114 +132,149 @@
 
     .form-group {
       display: grid;
-      gap: 6px;
+      gap: 8px;
     }
 
     label {
-      font-size: 0.85rem;
-      color: #34405c;
+      font-size: 0.9rem;
+      color: #3f5070;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     input,
     select {
       width: 100%;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid #d5dae6;
-      background: #fff;
-      font-size: 0.9rem;
-      color: #122238;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 2px solid #e8ecf1;
+      background: #fafbfc;
+      font-size: 0.95rem;
+      color: #1a2332;
       box-sizing: border-box;
+      font-family: 'Open Sans', sans-serif;
+      transition: all 0.2s ease;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
 
     button {
       width: 100%;
       border: none;
-      border-radius: 12px;
-      padding: 11px 14px;
+      border-radius: 14px;
+      padding: 13px 16px;
       font-size: 0.95rem;
       font-weight: 700;
       cursor: pointer;
       color: #fff;
-      background: linear-gradient(135deg, #3f8ee3 0%, #44c485 100%);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
     }
 
     button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 12px 16px rgba(34, 93, 214, 0.14);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
     }
 
     button.secondary {
-      background: #667794;
-      margin-top: 6px;
+      background: linear-gradient(135deg, #6b7c93 0%, #5a6878 100%);
+      box-shadow: 0 2px 8px rgba(107, 124, 147, 0.2);
+    }
+
+    button.secondary:hover {
+      box-shadow: 0 4px 16px rgba(107, 124, 147, 0.3);
     }
 
     .button-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 12px;
     }
 
     .header-row {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
-      gap: 12px;
+      gap: 16px;
+      margin-bottom: 4px;
     }
 
     .tabs {
       display: flex;
-      gap: 8px;
+      gap: 6px;
+      background: #f5f8fc;
+      padding: 4px;
+      border-radius: 12px;
     }
 
     .tab {
       border: none;
-      border-radius: 999px;
-      padding: 8px 12px;
-      background: #eef2f8;
-      color: #4b5f83;
+      border-radius: 10px;
+      padding: 7px 14px;
+      background: transparent;
+      color: #6b7c93;
       cursor: pointer;
       font-weight: 600;
-      transition: background 0.2s ease, color 0.2s ease;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+
+    .tab:hover {
+      color: #667eea;
     }
 
     .tab.active {
-      background: linear-gradient(135deg, #3f8ee3 0%, #44c485 100%);
-      color: #fff;
+      background: #fff;
+      color: #667eea;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.12);
     }
 
     .chip-row {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
+      margin: 8px 0;
     }
 
     .chip {
       display: inline-flex;
       align-items: center;
-      padding: 7px 12px;
+      padding: 8px 14px;
       border-radius: 999px;
-      background: #f5f8ff;
-      color: #2f436e;
-      font-size: 0.82rem;
+      background: linear-gradient(135deg, #f5f8fc 0%, #f0f3f8 100%);
+      color: #1a2332;
+      font-size: 0.85rem;
       font-weight: 600;
+      border: 1px solid rgba(102, 126, 234, 0.15);
     }
 
     .status-chip {
-      background: #eafbf0;
-      color: #227a38;
+      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+      color: #155724;
+      border-color: rgba(21, 87, 36, 0.2);
     }
 
     .section-title {
-      margin: 0;
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      color: #273250;
+      margin: 16px 0 12px;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #1a2332;
     }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="app-panel" class="panel hidden">
@@ -315,6 +387,6 @@
     </div>
   </div>
 
-  <script type="module" src="popup.js"></script>
+  <script src="popup.js"></script>
 </body>
 </html>
