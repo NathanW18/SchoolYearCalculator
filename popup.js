@@ -29,6 +29,7 @@ class SchoolYearTracker {
     this.endDateInput = document.getElementById('end-date-input');
     this.termLabelInput = document.getElementById('term-label-input');
     this.savedTermSelect = document.getElementById('saved-term-select');
+    this.holidaysInput = document.getElementById('holidays-input');
 
     this.saveBtn = document.getElementById('save-btn');
     this.editBtn = document.getElementById('edit-btn');
@@ -126,6 +127,7 @@ class SchoolYearTracker {
       this.termLabelInput.value = '';
       this.startDateInput.value = '';
       this.endDateInput.value = '';
+      if (this.holidaysInput) this.holidaysInput.value = '';
       this.updateDeleteVisibility();
       return;
     }
@@ -135,6 +137,7 @@ class SchoolYearTracker {
       this.termLabelInput.value = this.currentTerm.label;
       this.startDateInput.value = this.currentTerm.start;
       this.endDateInput.value = this.currentTerm.end;
+      if (this.holidaysInput) this.holidaysInput.value = (this.currentTerm.holidays || []).join(', ');
     }
     this.updateDeleteVisibility();
   }
@@ -155,6 +158,13 @@ class SchoolYearTracker {
     const label = this.termLabelInput.value.trim() || 'Custom school year';
     const start = this.startDateInput.value;
     const end = this.endDateInput.value;
+    
+    // Clean up comma-separated strings into a nice clean array
+    const holidaysRaw = this.holidaysInput ? this.holidaysInput.value : '';
+    const holidayArray = holidaysRaw
+      .split(',')
+      .map(date => date.trim())
+      .filter(date => date.length > 0);
 
     if (!start || !end) {
       alert('Please choose both a start date and an end date.');
@@ -173,6 +183,7 @@ class SchoolYearTracker {
       label,
       start,
       end,
+      holidays: holidayArray, // <-- This saves the holidays inside the term object
       createdAt: new Date().toISOString(),
     };
 
@@ -265,7 +276,7 @@ class SchoolYearTracker {
     if (this.detailsTab) this.detailsTab.classList.toggle('active', tab === 'details');
   }
 
-  showSetup() {
+ showSetup() {
     this.appPanel.classList.add('hidden');
     this.setupView.classList.remove('hidden');
 
@@ -274,12 +285,13 @@ class SchoolYearTracker {
       this.termLabelInput.value = this.currentTerm.label;
       this.startDateInput.value = this.currentTerm.start;
       this.endDateInput.value = this.currentTerm.end;
-      this.updateDeleteVisibility();
+      if (this.holidaysInput) this.holidaysInput.value = (this.currentTerm.holidays || []).join(', ');
     } else {
       this.savedTermSelect.value = '';
       this.termLabelInput.value = '';
       this.startDateInput.value = '';
       this.endDateInput.value = '';
+      if (this.holidaysInput) this.holidaysInput.value = '';
       this.updateDeleteVisibility();
     }
   }
@@ -419,12 +431,28 @@ class SchoolYearTracker {
   }
 
   countBusinessDays(startDate, endDate) {
+    if (!this.currentTerm) return 0;
+
     const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
     const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+    
+    const termHolidays = this.currentTerm.holidays || [];
     let count = 0;
+
     while (start < end) {
       const day = start.getDay();
-      if (day !== 0 && day !== 6) {
+      
+      // Formats current day pointer to match input text format "YYYY-MM-DD"
+      const yyyy = start.getFullYear();
+      const mm = String(start.getMonth() + 1).padStart(2, '0');
+      const dd = String(start.getDate()).padStart(2, '0');
+      const dateString = `${yyyy}-${mm}-${dd}`;
+
+      const isWeekend = (day === 0 || day === 6);
+      const isHoliday = termHolidays.includes(dateString);
+
+      // Only count the day if it's not a weekend AND not a custom holiday
+      if (!isWeekend && !isHoliday) {
         count += 1;
       }
       start.setDate(start.getDate() + 1);
