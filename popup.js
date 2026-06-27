@@ -39,6 +39,10 @@ class SchoolYearTracker {
     this.currentTermId = null;
     this.currentTerm = null;
 
+    // Show setup by default while storage loads so the popup is never blank.
+    this.appPanel.classList.add('hidden');
+    this.setupView.classList.remove('hidden');
+
     this.attachEventListeners();
     this.loadState();
   }
@@ -47,7 +51,7 @@ class SchoolYearTracker {
     this.saveBtn.addEventListener('click', () => this.saveTerm());
     this.editBtn.addEventListener('click', () => this.showSetup());
     this.clearBtn.addEventListener('click', () => this.clearSavedTerms());
-    this.cancelBtn.addEventListener('click', () => this.showSetup());
+    this.cancelBtn.addEventListener('click', () => this.showOverview());
     this.deleteBtn.addEventListener('click', () => this.deleteCurrentTerm());
     this.savedTermSelect.addEventListener('change', () => this.loadSelectedTerm());
     this.detailsButton.addEventListener('click', () => this.showDetails());
@@ -170,7 +174,7 @@ class SchoolYearTracker {
     this.currentTermId = term.id;
     chrome.storage.local.set({ schoolTerms: this.terms, selectedTermId: term.id }, () => {
       this.renderTermOptions();
-      this.showTracker();
+      this.showOverview();
     });
   }
 
@@ -194,7 +198,7 @@ class SchoolYearTracker {
       this.renderTermOptions();
       if (selectedTermId) {
         this.selectTerm(selectedTermId);
-        this.showTracker();
+        this.showOverview();
       } else {
         this.showSetup();
       }
